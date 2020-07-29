@@ -1,18 +1,27 @@
-const dishPromo = require('express').Router();
+const promoRouter = require('express').Router();
+const Promos = require('../models/promotions');
 
-
-dishPromo.route('/',(req,res,next)=>{
-    res.statusCode = 200;
-    res.setHeader('Content-Type','text/plain');
-    next();
-})
+promoRouter.route('/')
 .get((req,res,next)=>{
-    res.end('Will send all promotions to you');
+   
+    Promos.find({})
+     .then(promos => {
+        res.status = 200;
+        res.setHeader('Content-Type','application/json')
+        res.json(promos)
+     },err => next(err))
+     .catch(err => console.log(err))
+
 })
 
 .post((req,res,next)=>{
-    const {name, description}  = req.body;
-    res.end(`Will add the promotion: ${name} with details ${description}`)
+    Promos.create(req.body)
+    .then(promo => {
+        res.status = 201;
+        res.setHeader('Content-Type','application/json')
+        res.json(promo)
+    },err => next(err))
+    .catch(err => console.log(err));
 })
 
 .put((req,res,next)=>{
@@ -20,25 +29,53 @@ dishPromo.route('/',(req,res,next)=>{
 })
 
 .delete((req,res,next)=>{
-    res.end('Deleting all promotions.')
+    
+    Promos.deleteMany()
+    .then(resp => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(resp)
+    },err => next(err))
+    .catch(err => console.log(err));
 });
 
-dishPromo.route('/:promoId')
+promoRouter.route('/:promoId')
 .get((req,res,next)=>{
-    res.end('Will send details of the promo  ' + req.params.promoId + ' to you');
+  
+    Promos.findById(req.params.promoId)
+    .then(promo => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json')
+        res.json(promo)
+    },err => next(err))
+    .catch(err => console.log(err));
 })
+
 .post((req,res,next)=>{
     res.statusCode = 403;
-    res.end('Post operation not suppored on promo id: '+ req.params.promoId);
+    res.end('Post operation not suppored on promo id: ',req.params.promoId);
 })
 
 .put((req,res,next)=>{ 
-    res.write('Updating the Promotion: '+ req.params.promoId +'.')
-    res.end('Will update the Promotion : '+ req.body.name + ' with details '+req.body.description);
+   
+    Promos.findByIdAndUpdate(req.params.promoId,{$set: req.body},{new : true})
+    .then(promo => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json')
+        res.json(promo)
+    },err => next(err))
+    .catch(err => console.log(err));
 })
 
 .delete((req,res,next)=>{
-    res.end('Deleting Promotion : '+ req.params.promoId);
+    
+    Promos.findByIdAndDelete(req.params.promoId)
+    .then(resp => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(resp);
+    },err => next(err))
+    .catch(err => console.log(err));
 });
 
-module.exports = dishPromo;
+module.exports = promoRouter;
