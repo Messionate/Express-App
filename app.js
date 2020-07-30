@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let dishRouter = require('./routes/dishRouter');
@@ -11,7 +12,7 @@ let promoRouter = require('./routes/promoRouter');
 let leaderRouter = require('./routes/leaderRouter');
 
 const mongoose = require('mongoose');
-const Dishes = require('./models/dishes');
+//const Dishes = require('./models/dishes');
 
 const url = 'mongodb://localhost:27017/confusion';
 const connect = mongoose.connect(url,{useUnifiedTopology:true,useNewUrlParser: true});
@@ -29,10 +30,13 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('12345-67890-23459-98123'));
 
 function auth(req,res,next){
-  console.log(req.headers);
+  //console.log(req.headers);
+  console.log(req.signedCookies);
+
+  if(!req.signedCookies.user){
 
   let authHeader = req.headers.authorization;
   if(!authHeader){
@@ -41,12 +45,13 @@ function auth(req,res,next){
     err.status = 401;
     return next(err)
   }else{
-    let auth = new Buffer(authHeader.split(' ')[1],'base64').toString().split(':');
+    let auth = new Buffer.from(authHeader.split(' ')[1],'base64').toString().split(':');
 
     let username = auth[0];
     let password = auth[1];
 
     if(username === 'admin' && password === 'password'){
+      res.cookie('user','admin',{signed: true})
       next();
     }else{
       let err = new Error('You are not authenticated');
@@ -56,7 +61,15 @@ function auth(req,res,next){
     }
 
   }
-
+}else{
+    if(req.signedCookies.user === 'admin'){
+      next();
+    }else{
+      let err = new Error('You are not authenticated')
+      err.status = 401;
+      return next(err)
+    }
+}
 }
 
 app.use(auth);
