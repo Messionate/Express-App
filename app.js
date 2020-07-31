@@ -8,7 +8,7 @@ const FileStore = require('session-file-store')(session); // also can save using
 const passport = require('passport');
 const authenticate = require('./authenticate');
 
-
+const config = require('./config');
 const indexRouter = require('./routes/index');
 const router = require('./routes/users');
 let dishRouter = require('./routes/dishRouter');
@@ -18,7 +18,7 @@ let leaderRouter = require('./routes/leaderRouter');
 
 
 
-const url = 'mongodb://localhost:27017/confusion';
+const url = config.mongoUrl;
 const connect = mongoose.connect(url,{useUnifiedTopology:true,useNewUrlParser: true});
 connect.then(db =>{
   console.log('Connected Successfully');
@@ -38,35 +38,35 @@ app.use(express.urlencoded({ extended: false }));
 
 
 
-app.use(session({
-  name:'session-Id',
-  secret: '12345-67890-23459-98123',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
+// app.use(session({
+//   name:'session-Id',
+//   secret: '12345-67890-23459-98123',
+//   saveUninitialized: false,
+//   resave: false,
+//   store: new FileStore()
+// }));
 
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
+
+
+// function auth (req, res, next) {
+//   console.log(req.user);
+
+//   if (!req.user) {
+//     var err = new Error('You are not authenticated!');
+//     err.status = 403;
+//     next(err);
+//   }
+//   else {
+//         next();
+//   }
+// }
+// app.use(auth);
+
 
 app.use('/', indexRouter);
 app.use('/users', router);
-
-function auth (req, res, next) {
-  console.log(req.user);
-
-  if (!req.user) {
-    var err = new Error('You are not authenticated!');
-    err.status = 403;
-    next(err);
-  }
-  else {
-        next();
-  }
-}
-
-
-app.use(auth);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/dishes',dishRouter);

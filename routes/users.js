@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 const passport = require('passport');
 const User = require("../models/user");
-
+const authenticate = require('../authenticate');
 
 
 
@@ -21,35 +21,29 @@ router.post('/signup', (req, res, next) => {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
       res.json({err: err});
-    }
-    else {
+    }else {
       passport.authenticate('local')(req, res, () => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.json({success: true, status: 'Registration Successful!'});
+        res.json({success: true,status: 'Registration Successful!'});
       });
     }
-  });
+  })
 });
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
+
+  let token = authenticate.getToken({_id: req.user._id});
+
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, status: 'You are successfully logged in!'});
+  res.json({success: true,token:token,status: 'You are successfully logged in!'});
 });
 
 
-// router.post('/login', 
-//   passport.authenticate('local', { failureRedirect: '/login' }),
-//   function(req, res) {
-//     res.statusCode = 200;
-//     res.setHeader('Content-Type', 'application/json');
-//     res.json({success: true, status: 'You are successfully logged in!'});
-//   });
 
 
-
-router.get('/logout',(req,res,)=>{
+router.get('/logout',(req,res,next)=>{
 
     if(req.session){
       req.session.destroy();
