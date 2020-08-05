@@ -15,7 +15,7 @@ const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 const uploadRouter = require('./routes/uploadRouter');
-
+const favRouter = require('./routes/favoriteRouter');
 
 
 const url = config.mongoUrl;
@@ -47,31 +47,10 @@ app.use(express.urlencoded({ extended: false }));
 
 
 
-// app.use(session({
-//   name:'session-Id',
-//   secret: '12345-67890-23459-98123',
-//   saveUninitialized: false,
-//   resave: false,
-//   store: new FileStore()
-// }));
+
 
 app.use(passport.initialize());
-//app.use(passport.session());
 
-
-// function auth (req, res, next) {
-//   console.log(req.user);
-
-//   if (!req.user) {
-//     var err = new Error('You are not authenticated!');
-//     err.status = 403;
-//     next(err);
-//   }
-//   else {
-//         next();
-//   }
-// }
-// app.use(auth);
 
 
 app.use('/', indexRouter);
@@ -82,6 +61,9 @@ app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
 app.use('/imageUpload',uploadRouter);
+app.use('/favorites',favRouter);
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

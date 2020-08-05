@@ -63,7 +63,7 @@ const dishSchema = new Schema({
     timestamps :true
 });
 
-let Dishes = mongoose.model('Dish',dishSchema);
+let Dishes = mongoose.model('Dishes',dishSchema);
 
 module.exports = Dishes;
 
