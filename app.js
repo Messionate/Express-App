@@ -16,7 +16,7 @@ const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 const uploadRouter = require('./routes/uploadRouter');
 const favRouter = require('./routes/favoriteRouter');
-
+const commentRouter = require('./routes/commentRouter');
 
 const url = config.mongoUrl;
 const connect = mongoose.connect(url,{useUnifiedTopology:true,useNewUrlParser: true});
@@ -62,7 +62,7 @@ app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
 app.use('/imageUpload',uploadRouter);
 app.use('/favorites',favRouter);
-
+app.use('/comments',commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
